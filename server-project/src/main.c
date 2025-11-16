@@ -28,13 +28,53 @@
 
 #define NO_ERROR 0
 
-#define INDIRIZZO_IP_SERVER "127.0.0.1"
+#define INDIRIZZO_IP_SERVER "25.6.190.66"
 
 void clearwinsock() {
 #if defined WIN32
 	WSACleanup();
 #endif
 }
+
+void handleClientConnection(int client_socket);
+
+void handleClientConnection(int client_socket) {
+    char buffer[BUFFER_SIZE];
+    int bytes_received;
+
+    printf("Client connesso! In attesa di messaggi...\n");
+
+    // Ciclo di ricezione messaggi dal client
+    while (1) {
+        bytes_received = recv(client_socket, buffer, BUFFER_SIZE - 1, 0);
+
+        if (bytes_received > 0) {
+            buffer[bytes_received] = '\0'; // Termina la stringa
+            printf("Ricevuto dal client: %s\n", buffer);
+
+            // Echo - rimanda il messaggio al client
+            if (send(client_socket, buffer, bytes_received, 0) != bytes_received) {
+                errorhandler("send() failed.\n");
+                break;
+            }
+
+            // Se il client invia "quit", chiudi la connessione
+            if (strcmp(buffer, "quit") == 0) {
+                printf("Client ha richiesto la disconnessione.\n");
+                break;
+            }
+        } else if (bytes_received == 0) {
+            printf("Client disconnesso.\n");
+            break;
+        } else {
+            errorhandler("recv() failed.\n");
+            break;
+        }
+    }
+
+    closesocket(client_socket);
+}
+
 
 void errorhandler(char *error_message) {
 printf("%s",error_message);
@@ -49,7 +89,7 @@ int main(int argc, char *argv[]) {
 	WSADATA wsa_data;
 	/*la funzione MAKEWORD(2,2) specifica la versione del socket
 	 *&wsa_data viene riempita con informazioni
-	 *sull’implementazione di Winsock installata nel sistema.*/
+	 *sullï¿½implementazione di Winsock installata nel sistema.*/
 	int result = WSAStartup(MAKEWORD(2,2), &wsa_data);
 
 	if (result != NO_ERROR) {
@@ -75,7 +115,7 @@ int main(int argc, char *argv[]) {
 	 server_addr.sin_family = AF_INET;
 
 	 server_addr.sin_port = htons(SERVER_PORT); // converte un numero del formato del computer a quello della rete (Big-Endian)
-	 server_addr.sin_addr.s_addr = inet_addr(INDIRIZZO_IP_SERVER);
+	 server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
 	// TODO: Bind socket
 	 if ( // la funzione bind associa alla socket un indirizzo in modo da poter essere contattata da un client
@@ -94,11 +134,14 @@ int main(int argc, char *argv[]) {
 	  clearwinsock();
 	  return -1;
 	 }
-
+	 printf("===========================================\n");
+	    printf("Server TCP avviato sulla porta %d\n", SERVER_PORT);
+	    printf("In attesa di connessioni...\n");
+	    printf("===========================================\n");
 	// TODO: Implement connection acceptance loop
 /*
  * Bisogna innanzitutto creare una variabile che possa contenere il descrittore della socket temporanea,
- * quella che verrà utilizzata per comunicare direttamente con il client.
+ * quella che verrï¿½ utilizzata per comunicare direttamente con il client.
  * Successivamente si avvia un ciclo continuo che verifica costantemente se ci sono nuove richieste di connessione e,
  *  quando arrivano, le accetta tramite la funzione accept().
  *  Una volta stabilita la connessione, si utilizza la socket temporanea per lo scambio di dati con il client,
@@ -107,7 +150,7 @@ int main(int argc, char *argv[]) {
 	struct sockaddr_in cad; //structure for the client address
 	int client_socket; //socket descriptor for the client
 	int client_len; //the size of the client address
-	printf("Waiting for a client to connect...");
+	printf("\nWaiting for a client to connect...\n");
 	while (1) {
 		client_len = sizeof(cad); //set the size of the client address
 		if ((client_socket = accept(my_socket, (struct sockaddr *) &cad,
@@ -120,7 +163,9 @@ int main(int argc, char *argv[]) {
 		// clientSocket is connected to a client
 		printf("Handling client %s\n", inet_ntoa(cad.sin_addr));
 	// andare a cercare come si fa
-	//	handleclientconnection(client_socket);
+		handleClientConnection(client_socket);
+		 printf(">>> Connessione terminata.\n");
+		 printf("In attesa di nuove connessioni...\n\n");
 	}
 
 	printf("Server terminated.\n");

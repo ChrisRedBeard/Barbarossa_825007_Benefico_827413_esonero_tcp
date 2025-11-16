@@ -28,7 +28,7 @@
 
 #define NO_ERROR 0
 #define INDIRIZZO_IP_SERVER "127.0.0.1"
-#define PROTOPORT 57015 //numero di porta di default
+
 
 void clearwinsock() {
 #if defined WIN32
@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
 
 	/*la funzione MAKEWORD(2,2) specifica la versione del socket
 	 *&wsa_data viene riempita con informazioni
-	 *sull’implementazione di Winsock installata nel sistema.*/
+	 *sullï¿½implementazione di Winsock installata nel sistema.*/
 	int result = WSAStartup(MAKEWORD(2,2), &wsa_data);
 
 	if (result != NO_ERROR) {
@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
      memset(&server_addr,0,sizeof(server_addr));
 	 server_addr.sin_family = AF_INET;
 	 server_addr.sin_addr.s_addr = inet_addr(INDIRIZZO_IP_SERVER);
-	 server_addr.sin_port = htons(PROTOPORT);
+	 server_addr.sin_port = htons(SERVER_PORT);
 
 
 	// TODO: Connect to server
@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
 	  clearwinsock();
 	 return 0;
 	 }
-	 char* input_string = "prova"; // Stringa da inviare
+	 char* input_string = "Sono fortissimo!"; // Stringa da inviare
 	 int string_len = strlen(input_string); // Determina la lunghezza
 
 	 // TODO: Implement communication logic
@@ -124,7 +124,7 @@ int main(int argc, char *argv[]) {
 	// TODO: Close socket
 	 closesocket(my_socket);
 	 clearwinsock();
-	printf("Client terminated. 1231\n");
+	printf("\nClient terminated. 1231\n");
 
 
 	return 0;
