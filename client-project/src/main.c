@@ -27,6 +27,8 @@
 #include "protocol.h"
 
 #define NO_ERROR 0
+#define INDIRIZZO_IP_SERVER "127.0.0.1"
+#define PROTOPORT 57015 //numero di porta di default
 
 void clearwinsock() {
 #if defined WIN32
@@ -34,6 +36,9 @@ void clearwinsock() {
 #endif
 }
 
+void errorhandler(char *error_message) {
+	printf("%s",error_message);
+}
 int main(int argc, char *argv[]) {
 
 	// TODO: Implement client logic
@@ -53,7 +58,7 @@ int main(int argc, char *argv[]) {
 	}
 #endif
 
-	int my_socket;
+	int my_socket; //socket del client
 
 	// TODO: Create socket
 	 my_socket = socket(PF_INET, SOCK_STREAM,IPPROTO_TCP);
@@ -61,25 +66,66 @@ int main(int argc, char *argv[]) {
 	 //in caso di errore la funzione socket restituisce il messaggio riportato
 	 if (my_socket < 0) {
 	  errorhandler("socket creation failed.\n");
+	  closesocket(my_socket);
+	  clearwinsock();
 	  return -1;
 	 }
 
 	// TODO: Configure server address
-	// struct sockaddr_in server_addr;
-	// ...
+	 struct sockaddr_in server_addr;
+     memset(&server_addr,0,sizeof(server_addr));
+	 server_addr.sin_family = AF_INET;
+	 server_addr.sin_addr.s_addr = inet_addr(INDIRIZZO_IP_SERVER);
+	 server_addr.sin_port = htons(PROTOPORT);
+
 
 	// TODO: Connect to server
-	// connect(...);
+	 //stabilisce una connessione ad una socket specificata
+	 if (connect(my_socket,(struct sockaddr *) &server_addr, sizeof(server_addr)) < 0)
+	 {
+	  errorhandler( "Failed to connect.\n" );
+	  closesocket(my_socket);
+	  clearwinsock();
+	 return 0;
+	 }
+	 char* input_string = "prova"; // Stringa da inviare
+	 int string_len = strlen(input_string); // Determina la lunghezza
 
-	// TODO: Implement communication logic
-	// send(...);
-	// recv(...);
+	 // TODO: Implement communication logic
+	 //invia dati ad una socket connessa
+	 if (send(my_socket, input_string, string_len, 0) != string_len)
+	 {
+		 errorhandler("send() sent a different number of bytes than expected");
+		 closesocket(my_socket);
+		 clearwinsock();
+		 return -1;
+	 }
+
+	 // RICEVERE DATI DAL SERVER
+	 int bytes_rcvd;
+	 int total_bytes_rcvd = 0;
+	 char buf[BUFFER_SIZE]; // buffer for data from the server
+	 memset(buf, 0, BUFFER_SIZE); // ensures extra bytes contain 0
+	 printf("Received: "); // Setup to print the echoed string
+	 //riceve dati da una socket connessa
+	 while (total_bytes_rcvd < string_len) {
+	 if ((bytes_rcvd = recv(my_socket, buf, BUFFER_SIZE - 1, 0)) <= 0)
+	 {
+		 errorhandler("recv() failed or connection closed prematurely");
+		 closesocket(my_socket);
+		 clearwinsock();
+		 return -1;
+	 }
+	 total_bytes_rcvd += bytes_rcvd; // Keep tally of total bytes
+	 }
+	 buf[bytes_rcvd] = '\0'; // ridondante se si fa memset prima
+	 printf("%s", buf); // Print the echo buffer
 
 	// TODO: Close socket
-	// closesocket(my_socket);
-
+	 closesocket(my_socket);
+	 clearwinsock();
 	printf("Client terminated. 1231\n");
 
-	clearwinsock();
+
 	return 0;
 } // main end

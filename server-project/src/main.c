@@ -28,13 +28,16 @@
 
 #define NO_ERROR 0
 
-#define INDIRIZZO_IP_SERVER '127.0.0.1'
-#define QLEN 6
+#define INDIRIZZO_IP_SERVER "127.0.0.1"
 
 void clearwinsock() {
 #if defined WIN32
 	WSACleanup();
 #endif
+}
+
+void errorhandler(char *error_message) {
+printf("%s",error_message);
 }
 
 int main(int argc, char *argv[]) {
@@ -47,7 +50,7 @@ int main(int argc, char *argv[]) {
 	/*la funzione MAKEWORD(2,2) specifica la versione del socket
 	 *&wsa_data viene riempita con informazioni
 	 *sull’implementazione di Winsock installata nel sistema.*/
-	int result = WSAStartup(MAKEWORD(2,2), &wsa_data);s
+	int result = WSAStartup(MAKEWORD(2,2), &wsa_data);
 
 	if (result != NO_ERROR) {
 		printf("Error at WSAStartup()\n");
@@ -68,11 +71,11 @@ int main(int argc, char *argv[]) {
 	 //port e indirizzo IP
 	// TODO: Configure server address
 	 struct sockaddr_in server_addr;
-
+     memset(&server_addr,0,sizeof(server_addr));
 	 server_addr.sin_family = AF_INET;
 
 	 server_addr.sin_port = htons(SERVER_PORT); // converte un numero del formato del computer a quello della rete (Big-Endian)
-	 server_addr.sin_addr.s_addr = INDIRIZZO_IP_SERVER ;
+	 server_addr.sin_addr.s_addr = inet_addr(INDIRIZZO_IP_SERVER);
 
 	// TODO: Bind socket
 	 if ( // la funzione bind associa alla socket un indirizzo in modo da poter essere contattata da un client
@@ -85,14 +88,14 @@ int main(int argc, char *argv[]) {
 
 	// TODO: Set socket to listen
 
-	 if (listen (my_socket, QLEN) < 0) {
+	 if (listen (my_socket, QUEUE_SIZE) < 0) {
 	  errorhandler("listen() failed.\n");
 	  closesocket(my_socket);
+	  clearwinsock();
 	  return -1;
 	 }
 
 	// TODO: Implement connection acceptance loop
-	 while (1) {
 /*
  * Bisogna innanzitutto creare una variabile che possa contenere il descrittore della socket temporanea,
  * quella che verrà utilizzata per comunicare direttamente con il client.
@@ -100,10 +103,6 @@ int main(int argc, char *argv[]) {
  *  quando arrivano, le accetta tramite la funzione accept().
  *  Una volta stabilita la connessione, si utilizza la socket temporanea per lo scambio di dati con il client,
  *   mentre la socket principale, quella di benvenuto, rimane in ascolto e continua a gestire eventuali nuove connessioni.*/
-	     int client_socket = accept();
-	     // Handle client communication
-	     closesocket(client_socket);
-	 }
 
 	struct sockaddr_in cad; //structure for the client address
 	int client_socket; //socket descriptor for the client
@@ -120,7 +119,8 @@ int main(int argc, char *argv[]) {
 		}
 		// clientSocket is connected to a client
 		printf("Handling client %s\n", inet_ntoa(cad.sin_addr));
-		handleclientconnection(client_socket);
+	// andare a cercare come si fa
+	//	handleclientconnection(client_socket);
 	}
 
 	printf("Server terminated.\n");
