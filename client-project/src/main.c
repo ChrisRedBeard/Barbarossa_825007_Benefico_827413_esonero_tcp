@@ -39,7 +39,9 @@ void clearwinsock() {
 void errorhandler(char *error_message) {
 	printf("%s",error_message);
 }
+
 int main(int argc, char *argv[]) {
+
 
 	// TODO: Implement client logic
 
@@ -91,9 +93,18 @@ int main(int argc, char *argv[]) {
 	 char* input_string = "Sono fortissimo!"; // Stringa da inviare
 	 int string_len = strlen(input_string); // Determina la lunghezza
 
+
+	 weather_request_t req;
+	 sscanf(argv[2], "%c %[^\n]", &req.type, req.city);
+	 printf("tipo richiesta: %c\n",req.type);
+	 printf("nome città: %s\n",req.city);
+	 req.type=htonl(req.type);
+	 req.city=htonl(req.city);
+
+
 	 // TODO: Implement communication logic
 	 //invia dati ad una socket connessa
-	 if (send(my_socket, input_string, string_len, 0) != string_len)
+	 if (send(my_socket, &req, sizeof(weather_request_t), 0) != string_len)
 	 {
 		 errorhandler("send() sent a different number of bytes than expected");
 		 closesocket(my_socket);
