@@ -27,7 +27,7 @@
 #include "protocol.h"
 
 #define NO_ERROR 0 //già presente in winsock
-#define INDIRIZZO_IP_SERVER "10.121.54.85"
+#define INDIRIZZO_IP_SERVER "25.6.190.66"
 
 
 void clearwinsock() {
@@ -39,6 +39,9 @@ void clearwinsock() {
 void errorhandler(char *error_message) {
 	printf("%s",error_message);
 }
+
+
+
 
 int main(int argc, char *argv[]) {
 
@@ -114,11 +117,12 @@ int main(int argc, char *argv[]) {
 	 int bytes_rcvd;
 	 int total_bytes_rcvd = 0;
 	 char buf[BUFFER_SIZE]; // buffer for data from the server
+	 weather_response_t response;
 	 memset(buf, 0, BUFFER_SIZE); // ensures extra bytes contain 0
 	 printf("Received: "); // Setup to print the echoed string
 	 //riceve dati da una socket connessa
 	 while (total_bytes_rcvd < sizeof(weather_request_t)) {
-	 if ((bytes_rcvd = recv(my_socket, buf, BUFFER_SIZE - 1, 0)) <= 0)
+	 if ((bytes_rcvd = recv(my_socket, (char*)&response, sizeof(weather_request_t) - 1, 0)) <= 0)
 	 {
 		 errorhandler("recv() failed or connection closed prematurely");
 		 closesocket(my_socket);
@@ -129,6 +133,7 @@ int main(int argc, char *argv[]) {
 	 }
 	 buf[bytes_rcvd] = '\0'; // ridondante se si fa memset prima
 	 printf("%s", buf); // Print the echo buffer
+
 
 	// TODO: Close socket
 	 closesocket(my_socket);

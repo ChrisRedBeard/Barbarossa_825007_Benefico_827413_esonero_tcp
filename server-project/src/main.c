@@ -126,6 +126,8 @@ void handleClientConnection(int client_socket) {
 
 
 
+            response.status= htonl(response.status);
+            htonl(response.value);
 
             if (send(client_socket, (char*)&response, sizeof(weather_response_t), 0) != sizeof(weather_response_t))
            	 {
