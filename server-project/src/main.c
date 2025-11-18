@@ -54,15 +54,16 @@ float get_pressure(void){// Range: 950.0 to 1050.0 hPa
 
 int findString(const char *target) {
 
-	char *lista[] = {
-			"Ancona", "Bari", "Bologna", "Cagliari", "Catania", "Firenze", "Genova", "Milano", "Napoli", "Palermo", "Perugia", "Pisa", "Reggio Calabria", "Roma", "Taranto", "Torino", "Trento", "Trieste", "Venezia", "Verona"
-	};
+	char *lista[] = { "ancona", "bari", "bologna", "cagliari", "catania",
+			"firenze", "genova", "milano", "napoli", "palermo", "perugia",
+			"pisa", "reggio calabria", "roma", "taranto", "torino", "trento",
+			"trieste", "venezia", "verona" };
 	int size = 20;
-    for (int i = 0; i < size; i++) {
-        if (strcmp(lista[i], target) == 0)
-            return 0; // trovato
-    }
-    return 1; // non trovato
+	for (int i = 0; i < size; i++) {
+		if (strcmp(lista[i], target) == 0)
+			return 0; // trovato
+	}
+	return 1; // non trovato
 }
 
 
@@ -126,8 +127,13 @@ void handleClientConnection(int client_socket) {
 
 
 
-            response.status= htonl(response.status);
-            htonl(response.value);
+//            response.status= htonl(response.status);
+//            htonl(response.value);
+            printf("INVIO RISPOSTA IN CORSO:\n")
+            printf("Status: %d\n",response.status);
+            printf("invio risposta:Tipo: %c\n",response.type);
+            printf("invio risposta:Valore: %.2f\n",response.value);
+
 
             if (send(client_socket, (char*)&response, sizeof(weather_response_t), 0) != sizeof(weather_response_t))
            	 {
@@ -231,15 +237,17 @@ int main(int argc, char *argv[]) {
 	while (1) {
 		client_len = sizeof(cad); //set the size of the client address
 		if ((client_socket = accept(my_socket, (struct sockaddr *) &cad,
-				&client_len)) < 0) {
+				&client_len)) < 0){
 			errorhandler("accept() failed.\n");
 			closesocket(my_socket);
 			clearwinsock();
 			return -1;
 		}
 		// clientSocket is connected to a client
-		printf("Handling client %s\n", inet_ntoa(cad.sin_addr));
-	// andare a cercare come si fa
+		printf("===========================================\n");
+		printf("Client trovato!\n");
+		printf("Indirizzo IP client: %s\n", inet_ntoa(cad.sin_addr));
+		printf("===========================================\n");
 		handleClientConnection(client_socket);
 		 printf(">>> Connessione terminata.\n");
 		 printf("In attesa di nuove connessioni...\n\n");
