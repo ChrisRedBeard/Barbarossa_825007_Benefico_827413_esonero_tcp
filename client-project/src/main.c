@@ -41,6 +41,25 @@ void errorhandler(char *error_message) {
 }
 
 
+char* valueToString(char tipo,float value){
+	static char temp[40];
+	switch (tipo) {
+			case 't':
+			     snprintf(temp,sizeof(temp),"Temperatura = %.1f °C",value);
+				break;
+			case 'p':
+				snprintf(temp,sizeof(temp),"Pressione = %.1f hPA",value);
+				break;
+			case 'h':
+				snprintf(temp,sizeof(temp),"Umidita' = %.1f %%",value);
+				break;
+			case 'w':
+				snprintf(temp,sizeof(temp),"Vento = %.1f Km/h",value);
+				break;
+	}
+	return temp;
+}
+
 
 
 int main(int argc, char *argv[]) {
@@ -119,26 +138,43 @@ int main(int argc, char *argv[]) {
 	 char buf[BUFFER_SIZE]; // buffer for data from the server
 	 weather_response_t response;
 	 memset(buf, 0, BUFFER_SIZE); // ensures extra bytes contain 0
-	 printf("Received: "); // Setup to print the echoed string
+
 	 //riceve dati da una socket connessa
-	 while (total_bytes_rcvd < sizeof(weather_request_t)) {
-	 if ((bytes_rcvd = recv(my_socket, (char*)&response, sizeof(weather_request_t) - 1, 0)) <= 0)
-	 {
-		 errorhandler("recv() failed or connection closed prematurely");
-		 closesocket(my_socket);
-		 clearwinsock();
-		 return -1;
+	 while (total_bytes_rcvd < sizeof(weather_response_t)) {
+
+	     bytes_rcvd = recv(
+	         my_socket,
+	         ((char*)&response) + total_bytes_rcvd,
+	         sizeof(weather_response_t) - total_bytes_rcvd,
+	         0
+	     );
+
+	     if (bytes_rcvd <= 0) {
+	         errorhandler("recv() failed or connection closed prematurely");
+	         closesocket(my_socket);
+	         clearwinsock();
+	         return -1;
+	     }
+
+	     total_bytes_rcvd += bytes_rcvd;
 	 }
-	 total_bytes_rcvd += bytes_rcvd; // Keep tally of total bytes
+	 switch(response.status){
+	  case 1: printf("Ricevuto risultato dal server ip %s Citta' non disponibile",INDIRIZZO_IP_SERVER);
+	  	  	  break;
+	  case 2: printf("Ricevuto risultato dal server ip %s Richiesta non valida",INDIRIZZO_IP_SERVER);
+	  	  	  break;
+	  default:printf("Ricevuto risultato dal server ip %s %s: %s",INDIRIZZO_IP_SERVER,req.city,valueToString(response.type,response.value));
+	  	  	  break;
 	 }
-	 buf[bytes_rcvd] = '\0'; // ridondante se si fa memset prima
-	 printf("%s", buf); // Print the echo buffer
+
+	 //buf[bytes_rcvd] = '\0'; // ridondante se si fa memset prima
+	 //printf("%s", buf); // Print the echo buffer
 
 
 	// TODO: Close socket
 	 closesocket(my_socket);
 	 clearwinsock();
-	printf("\nClient terminated. 1231\n");
+	printf("\nClient terminated.\n");
 
 
 	return 0;
