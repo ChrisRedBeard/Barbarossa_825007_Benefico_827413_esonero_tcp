@@ -26,9 +26,9 @@
 #include <stdlib.h>
 #include "protocol.h"
 
-#define NO_ERROR 0
+#define NO_ERROR 0 //gi√† definita in WINSOCK
 
-#define INDIRIZZO_IP_SERVER "127.0.0.1"
+#define INDIRIZZO_IP_SERVER "10.121.54.119"
 
 void clearwinsock() {
 #if defined WIN32
@@ -37,7 +37,7 @@ void clearwinsock() {
 }
 
 
-float get_temperature(void){// Range: -10.0 to 40.0 ∞C
+float get_temperature(void){// Range: -10.0 to 40.0 ÔøΩC
 
 	return (-10.0) + (float)rand() / RAND_MAX * ((40.0) - (-10.0));
 }
@@ -46,12 +46,15 @@ float get_humidity(void){ // Range: 20.0 to 100.0 %
 	return (20.0) + (float)rand() / RAND_MAX * ((100.0) - (20.0));
 }
 float get_wind(void){ // Range: 0.0 to 100.0 km/h
-	return (float)rand() / RAND_MAX * ((100.0));
+	return (float)rand() / RAND_MAX * (100.0);
 }
 float get_pressure(void){// Range: 950.0 to 1050.0 hPa
 	return (950.0) + (float)rand() / RAND_MAX * ((1050.0) - (950.0));
 }
 
+void errorhandler(char *error_message) {
+printf("%s",error_message);
+}
 
 
 void handleClientConnection(int client_socket);
@@ -60,26 +63,30 @@ void handleClientConnection(int client_socket) {
     char buffer[BUFFER_SIZE];
     int bytes_received;
     weather_response_t response;
+    weather_request_t request;
 
     printf("Client connesso! In attesa di messaggi...\n");
 
     // Ciclo di ricezione messaggi dal client
     while (1) {
-        bytes_received = recv(client_socket, &response, sizeof(weather_response_t) - 1, 0);
-
-        response.status=ntohl(response.status);
-        response.type=ntohl(response.type);
-        response.value=ntohl(response.value);
+        bytes_received = recv(client_socket, (char*)&request, sizeof(weather_request_t), 0);
 
 
+                   // Echo: rimanda la struct al client
+//                   if (send(client_socket, (char*)&response, sizeof(weather_response_t), 0) != sizeof(weather_response_t)) {
+//                       errorhandler("send() failed.\n");
+//                       break;
+//                   }
 
-
-        if (bytes_received > 0) {
+         if (bytes_received > 0) {
             buffer[bytes_received] = '\0'; // Termina la stringa
-            printf("Ricevuto dal client: %s\n", buffer);
 
-            printf("tipo richiesta: %c\n",response.type);
-            printf("nome citt‡: %s\n",response.);
+            printf("Tipo richiesto: %c\n", request.type);
+            printf("Citt√† richiesta: %s\n", request.city);  // se la struct ha un campo char[] city
+
+
+
+
 
             // Echo - rimanda il messaggio al client
             if (send(client_socket, buffer, bytes_received, 0) != bytes_received) {
@@ -103,14 +110,6 @@ void handleClientConnection(int client_socket) {
 
     closesocket(client_socket);
 }
-
-
-void errorhandler(char *error_message) {
-printf("%s",error_message);
-}
-
-
-
 
 
 int main(int argc, char *argv[]) {
@@ -186,7 +185,7 @@ int main(int argc, char *argv[]) {
 	int client_socket; //socket descriptor for the client
 	int client_len; //the size of the client address
 	printf("\nWaiting for a client to connect...\n");
-	weather_response_t response;
+
 	while (1) {
 		client_len = sizeof(cad); //set the size of the client address
 		if ((client_socket = accept(my_socket, (struct sockaddr *) &cad,

@@ -20,9 +20,14 @@ typedef struct {
     float value;          // Weather data value
 } weather_response_t;
 
+typedef struct {
+    char type;        // Weather data type: 't', 'h', 'w', 'p'
+    char city[64];    // City name (null-terminated string)
+} weather_request_t;
+
 // Function prototypes
 // Add here the signatures of the functions implemented by students
-float get_temperature(void);    // Range: -10.0 to 40.0 °C
+float get_temperature(void);    // Range: -10.0 to 40.0 ï¿½C
 float get_humidity(void);       // Range: 20.0 to 100.0 %
 float get_wind(void);           // Range: 0.0 to 100.0 km/h
 float get_pressure(void);       // Range: 950.0 to 1050.0 hPa
