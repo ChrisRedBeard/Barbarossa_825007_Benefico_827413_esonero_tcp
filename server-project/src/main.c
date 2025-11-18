@@ -28,7 +28,7 @@
 
 #define NO_ERROR 0 //già definita in WINSOCK
 
-#define INDIRIZZO_IP_SERVER "10.121.54.119"
+#define INDIRIZZO_IP_SERVER "25.6.190.66"
 
 void clearwinsock() {
 #if defined WIN32
@@ -52,6 +52,21 @@ float get_pressure(void){// Range: 950.0 to 1050.0 hPa
 	return (950.0) + (float)rand() / RAND_MAX * ((1050.0) - (950.0));
 }
 
+int findString(const char *target) {
+
+	char *lista[] = {
+			"Ancona", "Bari", "Bologna", "Cagliari", "Catania", "Firenze", "Genova", "Milano", "Napoli", "Palermo", "Perugia", "Pisa", "Reggio Calabria", "Roma", "Taranto", "Torino", "Trento", "Trieste", "Venezia", "Verona"
+	};
+	int size = 20;
+    for (int i = 0; i < size; i++) {
+        if (strcmp(lista[i], target) == 0)
+            return 0; // trovato
+    }
+    return 1; // non trovato
+}
+
+
+
 void errorhandler(char *error_message) {
 printf("%s",error_message);
 }
@@ -70,29 +85,54 @@ void handleClientConnection(int client_socket) {
     // Ciclo di ricezione messaggi dal client
     while (1) {
         bytes_received = recv(client_socket, (char*)&request, sizeof(weather_request_t), 0);
+       strlwr(request.city);
+       request.type=tolower(request.type);
 
+       response.status=findString(request.city);
 
-                   // Echo: rimanda la struct al client
-//                   if (send(client_socket, (char*)&response, sizeof(weather_response_t), 0) != sizeof(weather_response_t)) {
-//                       errorhandler("send() failed.\n");
-//                       break;
-//                   }
+       if(response.status==0){
+       switch (request.type) {
+		case 't':
+			response.value = get_temperature();
+			response.type=request.type;
+			break;
+		case 'p':
+			response.value = get_pressure();
+			response.type=request.type;
+			break;
+		case 'h':
+			response.value = get_humidity();
+			response.type=request.type;
+			break;
+		case 'w':
+			response.value = get_wind();
+			response.type=request.type;
+			break;
+		default:
+		       response.status= 2;
+		        break;
+		};
+       }else{
+    	   response.value=0.0;
+       };
 
          if (bytes_received > 0) {
             buffer[bytes_received] = '\0'; // Termina la stringa
 
             printf("Tipo richiesto: %c\n", request.type);
-            printf("Città richiesta: %s\n", request.city);  // se la struct ha un campo char[] city
+            printf("Città richiesta: %s\n", request.city);
 
 
 
 
 
-            // Echo - rimanda il messaggio al client
-            if (send(client_socket, buffer, bytes_received, 0) != bytes_received) {
-                errorhandler("send() failed.\n");
-                break;
-            }
+
+            if (send(client_socket, (char*)&response, sizeof(weather_response_t), 0) != sizeof(weather_response_t))
+           	 {
+           		 errorhandler("send() sent a different number of bytes than expected");
+           		 closesocket(client_socket);
+           		 clearwinsock();
+           	 }
 
             // Se il client invia "quit", chiudi la connessione
             if (strcmp(buffer, "quit") == 0) {
