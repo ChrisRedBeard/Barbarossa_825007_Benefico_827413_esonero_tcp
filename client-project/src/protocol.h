@@ -17,6 +17,13 @@ typedef struct {
     char city[64];    // City name (null-terminated string)
 } weather_request_t;
 
+
+typedef struct {
+    unsigned int status;  // Response status code
+    char type;            // Echo of request type
+    float value;          // Weather data value
+} weather_response_t;
+
 // Function prototypes
 // Add here the signatures of the functions implemented by students
 
