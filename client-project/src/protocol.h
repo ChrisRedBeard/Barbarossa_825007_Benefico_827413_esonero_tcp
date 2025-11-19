@@ -9,7 +9,7 @@
 #define PROTOCOL_H_
 
 // Shared application parameters
-#define SERVER_PORT 27015  // Server port (change if needed)
+#define SERVER_PROTOPORT 27015  // Server port (change if needed)
 #define BUFFER_SIZE 512    // Buffer size for messages
 
 typedef struct {
