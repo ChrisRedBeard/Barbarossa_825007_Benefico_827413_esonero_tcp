@@ -9,6 +9,7 @@
 
 #if defined WIN32
 #include <winsock.h> // inizializzazione per socket in windows
+typedef int socklen_t;
 #else
 #include <string.h>
 //servono per l'inizialiazzazione del socket su mac/Unix non necessarie per Windows
@@ -257,11 +258,12 @@ int main(int argc, char *argv[]) {
 
 	struct sockaddr_in cad; //structure for the client address
 	int client_socket; //socket descriptor for the client
-	int client_len; //the size of the client address
-	printf("\nIn attesa di connessione di un client...\n");
+
+
+		printf("\nIn attesa di connessione di un client...\n");
 
 	while (1) {
-		client_len = sizeof(cad); //set the size of the client address
+		socklen_t client_len = sizeof(cad); //set the size of the client address
 		if ((client_socket = accept(my_socket, (struct sockaddr*) &cad,
 				&client_len)) < 0) {
 			errorhandler("funzione accept() fallita.\n");
