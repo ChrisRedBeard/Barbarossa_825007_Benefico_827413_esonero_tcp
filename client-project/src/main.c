@@ -10,6 +10,7 @@
 
 #if defined WIN32
 #include <winsock.h> // inizializzazione per socket in windows
+#include <windows.h>
 #else
 #include <string.h>
 //servono per l'inizialiazzazione del socket su mac/Unix non necessarie per Windows
@@ -27,8 +28,9 @@
 #include <stdlib.h>
 #include "protocol.h"
 
-#define NO_ERROR 0 //gi presente in winsock
-#define INDIRIZZO_IP_SERVER "25.6.190.66"
+
+#define NO_ERROR 0 //già presente in winsock
+#define INDIRIZZO_IP_SERVER "127.0.0.1"
 
 
 void clearwinsock() {
@@ -46,7 +48,7 @@ char* valueToString(char tipo,float value){
 	static char temp[40];
 	switch (tipo) {
 			case 't':
-			     snprintf(temp,sizeof(temp),"Temperatura = %.1f °C",value);
+			     snprintf(temp,sizeof(temp),"Temperatura = %.1f \u00B0C",value);
 				break;
 			case 'p':
 				snprintf(temp,sizeof(temp),"Pressione = %.1f hPA",value);
@@ -135,6 +137,8 @@ int main(int argc, char *argv[]) {
 	// TODO: Implement client logic
 
 #if defined WIN32
+	SetConsoleOutputCP(CP_UTF8);
+
 	// Initialize Winsock
 	WSADATA wsa_data;
 
@@ -166,8 +170,8 @@ int main(int argc, char *argv[]) {
 	 struct sockaddr_in server_addr;
      memset(&server_addr,0,sizeof(server_addr));
 	 server_addr.sin_family = AF_INET;
-	 server_addr.sin_addr.s_addr = inet_addr(INDIRIZZO_IP_SERVER);
-	 server_addr.sin_port = htons(SERVER_PROTOPORT);
+	 server_addr.sin_addr.s_addr = inet_addr(server_ip);
+	 server_addr.sin_port = htons(port);
 
 
 	// TODO: Connect to server
@@ -179,14 +183,6 @@ int main(int argc, char *argv[]) {
 	  clearwinsock();
 	 return 0;
 	 }
-	 char* input_string = "Sono fortissimo!"; // Stringa da inviare
-	// int string_len = strlen(input_string); // Determina la lunghezza
-
-
-
-//	 sscanf(argv[2], "%c %[^\n]", &req.type, req.city);
-//	 printf("tipo richiesta: %c\n",req.type);
-//	 printf("nome citta': %s\n",req.city);
 
 
 	 // TODO: Implement communication logic
@@ -230,18 +226,15 @@ int main(int argc, char *argv[]) {
 	  	  	  break;
 	  case 2: printf("Ricevuto risultato dal server ip %s Richiesta non valida",INDIRIZZO_IP_SERVER);
 	  	  	  break;
-	  default:printf("Ricevuto risultato dal server ip %s %s: %s",INDIRIZZO_IP_SERVER,req.city,valueToString(response.type,response.value));
+	  default:	printf("Ricevuto risultato dal server ip %s %s: %s",server_ip,req.city,valueToString(response.type,response.value));
 	  	  	  break;
 	 }
-
-	 //buf[bytes_rcvd] = '\0'; // ridondante se si fa memset prima
-	 //printf("%s", buf); // Print the echo buffer
 
 
 	// TODO: Close socket
 	 closesocket(my_socket);
 	 clearwinsock();
-	printf("\nClient terminated.\n");
+	printf("\nClient terminato.\n");
 
 
 	return 0;
