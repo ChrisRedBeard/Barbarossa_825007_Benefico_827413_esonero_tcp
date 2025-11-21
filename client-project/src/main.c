@@ -197,7 +197,7 @@ int main(int argc, char *argv[]) {
 
 	 // RICEVERE DATI DAL SERVER
 	 int bytes_rcvd;
-	 int total_bytes_rcvd = 0;
+	 unsigned long int total_bytes_rcvd = 0;
 	 char buf[BUFFER_SIZE]; // buffer for data from the server
 	 weather_response_t response;
 	 memset(buf, 0, BUFFER_SIZE); // ensures extra bytes contain 0
