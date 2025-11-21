@@ -202,7 +202,7 @@ int main(int argc, char *argv[]) {
 	int result = WSAStartup(MAKEWORD(2, 2), &wsa_data);
 
 	if (result != NO_ERROR) {
-		printf("Error at WSAStartup()\n");
+		printf("Errore in WSAStartup()\n");
 		return 0;
 	}
 #endif
@@ -214,7 +214,7 @@ int main(int argc, char *argv[]) {
 
 	//in caso di errore la funzione socket restituisce il messaggio riportato
 	if (my_socket < 0) {
-		errorhandler("socket creation failed.\n");
+		errorhandler("creazione del socket fallita.\n");
 		return -1;
 	}
 	//port e indirizzo IP
@@ -237,7 +237,7 @@ int main(int argc, char *argv[]) {
 	// TODO: Set socket to listen
 
 	if (listen(my_socket, QUEUE_SIZE) < 0) {
-		errorhandler("listen() failed.\n");
+		errorhandler("funzione listen() fallita.\n");
 		closesocket(my_socket);
 		clearwinsock();
 		return -1;
@@ -258,13 +258,13 @@ int main(int argc, char *argv[]) {
 	struct sockaddr_in cad; //structure for the client address
 	int client_socket; //socket descriptor for the client
 	int client_len; //the size of the client address
-	printf("\nWaiting for a client to connect...\n");
+	printf("\nIn attesa di connessione di un client...\n");
 
 	while (1) {
 		client_len = sizeof(cad); //set the size of the client address
 		if ((client_socket = accept(my_socket, (struct sockaddr*) &cad,
 				&client_len)) < 0) {
-			errorhandler("accept() failed.\n");
+			errorhandler("funzione accept() fallita.\n");
 			closesocket(my_socket);
 			clearwinsock();
 			return -1;
