@@ -26,7 +26,7 @@
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1547987851" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.mingw.base.258956459" name="MinGW C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.mingw.base">
-								<option id="gnu.c.link.option.libs.1648894518" superClass="gnu.c.link.option.libs" valueType="libs">
+								<option id="gnu.c.link.option.libs.1648894518" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="wsock32"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.193400020" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
@@ -37,6 +37,11 @@
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.mingw.base.2024744716" name="MinGW C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.mingw.base"/>
 						</toolChain>
 					</folderInfo>
+					<fileInfo id="cdt.managedbuild.config.gnu.exe.debug.1.964333017" name="main.c" rcbsApplicability="disable" resourcePath="src/main.c" toolsToInvoke="cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1846426733.1199317156">
+						<tool id="cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1846426733.1199317156" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1846426733">
+							<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1224265244" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+						</tool>
+					</fileInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>
@@ -48,13 +53,16 @@
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 		<project id="client-project.cdt.managedbuild.target.gnu.exe.1" name="Executable" projectType="cdt.managedbuild.target.gnu.exe"/>
 	</storageModule>
-	<storageModule moduleId="scannerConfiguration">
-		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="refreshScope" versionNumber="2">
 		<configuration configurationName="Debug">
 			<resource resourceType="PROJECT" workspacePath="/client-project"/>
 		</configuration>
+	</storageModule>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.1;cdt.managedbuild.config.gnu.exe.debug.1.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1846426733;cdt.managedbuild.tool.gnu.c.compiler.input.1547987851">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
 	</storageModule>
 </cproject>
