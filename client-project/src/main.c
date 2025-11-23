@@ -54,7 +54,7 @@ char* valueToString(char tipo,float value){
 				snprintf(temp,sizeof(temp),"Pressione = %.1f hPA",value);
 				break;
 			case 'h':
-				snprintf(temp,sizeof(temp),"Umidità = %.1f %%",value);
+				snprintf(temp,sizeof(temp),"Umidita' = %.1f %%",value);
 				break;
 			case 'w':
 				snprintf(temp,sizeof(temp),"Vento = %.1f Km/h",value);
@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
 	            fprintf(stderr, "Errore: manca il valore dopo -s\n");
 	            return -1;
 	        }
-	        strncpy(server_ip, argv[i+1], sizeof(server_ip));
+	        snprintf(server_ip, sizeof(server_ip), "%s", argv[i+1]);
 	        i += 2;
 	        continue;
 	    }
